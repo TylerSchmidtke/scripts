@@ -24,8 +24,11 @@ do_api_key = 'Bearer yourAPIkeyHere'
 do_api_url = 'https://api.digitalocean.com/v2/domains/%s/records' % DOMAIN_NAME
 do_request_header = {'content-type': 'application/json', 'Authorization': do_api_key}
 
-# Determine current external IP
-external_ip = requests.get('http://echoip.com').text
+# Determine current external IP, try a alternate if the first fails
+try:
+    external_ip = requests.get('http://echoip.com').text
+except requests.ConnectionError:
+    external_ip = requests.get("http://api.ipify.org?format=json").json()["ip"]
 
 # Get list of domains on DO account
 get_domains = requests.get(do_api_url, headers=do_request_header).json()
